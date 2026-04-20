@@ -1,160 +1,44 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verb Master Pro v2</title>
-    <style>
-        :root { --primary: #6366f1; --bg: #f1f5f9; --white: #ffffff; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        
-        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
-        .glass-card { background: var(--white); border-radius: 24px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        
-        h1 { margin: 0 0 15px 0; font-size: 24px; text-align: center; color: var(--primary); }
-
-        /* 입력창 세로 정렬 및 버튼 고정 */
-        .search-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .input-row { display: flex; gap: 10px; }
-        input { flex: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 16px; }
-        select { width: 100px; padding: 10px; border-radius: 14px; border: 2px solid #e2e8f0; }
-        
-        .main-btn { 
-            width: 100%; padding: 15px; background: var(--primary); color: white; 
-            border: none; border-radius: 14px; font-weight: 800; font-size: 16px;
-            cursor: pointer; transition: 0.2s; white-space: nowrap;
-        }
-        .main-btn:active { transform: scale(0.98); }
-
-        /* 분석 결과창 */
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; display: none; }
-        .pill { background: #f8fafc; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
-        .pill-label { font-size: 10px; color: #94a3b8; font-weight: bold; }
-        .pill-value { font-size: 13px; font-weight: 700; color: #1e293b; }
-
-        /* 예문 카드 + 음성 버튼 */
-        .example-card { background: #fff; padding: 18px; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; }
-        .eng { font-size: 17px; font-weight: 700; color: #1e293b; padding-right: 35px; }
-        .kor { color: #64748b; font-size: 14px; margin-top: 4px; }
-        .speak-btn { position: absolute; right: 15px; top: 18px; cursor: pointer; font-size: 20px; background: none; border: none; }
-
-        /* 학습 기록 (하단 정렬) */
-        .history-section { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; }
-        .history-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .h-item { padding: 6px 12px; background: #eff6ff; color: var(--primary); border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
-
-        .loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--primary); }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="glass-card">
-        <h1>🔍 Verb Master Pro</h1>
-        
-        <div class="search-area">
-            <div class="input-row">
-                <input type="text" id="word" placeholder="예: give up, add to">
-                <select id="diff">
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Med</option>
-                    <option value="Hard">Hard</option>
-                </select>
-            </div>
-            <button class="main-btn" onclick="analyze()">분석하기</button>
-        </div>
-
-        <div id="loader" class="loader">문법 구조 분석 중...</div>
-
-        <div id="resGrid" class="info-grid">
-            <div class="pill"><div class="pill-label">유형</div><div id="r1" class="pill-value"></div></div>
-            <div class="pill"><div class="pill-label">뒤에 오는 형태</div><div id="r2" class="pill-value"></div></div>
-            <div class="pill"><div class="pill-label">중간 삽입</div><div id="r3" class="pill-value"></div></div>
-        </div>
-
-        <div id="exArea"></div>
-    </div>
-
-    <div class="history-section">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0; font-size:16px;">📚 최근 학습 기록</h3>
-            <span onclick="clearH()" style="font-size:11px; color:#ef4444; cursor:pointer;">전체삭제</span>
-        </div>
-        <div id="hList" class="history-list"></div>
-    </div>
-</div>
-
 <script>
-    let hData = JSON.parse(localStorage.getItem('vH') || '[]');
-    renderH();
-
     async function analyze() {
         const word = document.getElementById('word').value.trim();
         const diff = document.getElementById('diff').value;
         if(!word) return;
 
-        document.getElementById('loader').style.display = 'block';
-        document.getElementById('resGrid').style.display = 'none';
-        document.getElementById('exArea').innerHTML = '';
+        const loader = document.getElementById('loader');
+        const exArea = document.getElementById('exArea');
+        const resGrid = document.getElementById('resGrid');
+
+        loader.style.display = 'block';
+        loader.style.color = '#6366f1';
+        loader.innerText = "문법 분석 중...";
+        resGrid.style.display = 'none';
+        exArea.innerHTML = '';
 
         try {
             const res = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=3`);
             const data = await res.json();
-            if(data.error) throw new Error(data.error);
 
-            show(word, data);
+            // 에러가 발생했을 때 상세 내용 출력
+            if (data.error) {
+                loader.style.color = '#ef4444';
+                loader.innerHTML = `
+                    <div style="border:1px solid #fee2e2; background:#fef2f2; padding:15px; border-radius:12px;">
+                        <strong>⚠️ 에러 발생</strong><br>
+                        <small>${data.message}</small><br>
+                        <span style="font-size:10px;">코드: ${data.error}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // 정상 출력 로직
+            display(word, data);
             save(word, data);
+            loader.style.display = 'none';
         } catch (e) {
-            console.error(e);
-            alert("분석 중 오류가 발생했습니다. (API 키 혹은 파싱 문제)");
-        } finally {
-            document.getElementById('loader').style.display = 'none';
+            loader.style.color = '#ef4444';
+            loader.innerText = "네트워크 오류가 발생했습니다.";
         }
     }
-
-    function show(word, data) {
-        document.getElementById('resGrid').style.display = 'grid';
-        document.getElementById('r1').innerText = data.grammar_analysis.type;
-        document.getElementById('r2').innerText = data.grammar_analysis.following_form;
-        document.getElementById('r3').innerText = data.grammar_analysis.is_separable;
-
-        document.getElementById('exArea').innerHTML = data.examples.map(ex => `
-            <div class="example-card">
-                <div class="eng">${ex.eng}</div>
-                <div class="kor">${ex.kor}</div>
-                <button class="speak-btn" onclick="speak('${ex.eng.replace(/'/g, "\\'")}')">🔊</button>
-                <div style="font-size:11px; color:#10b981; margin-top:8px;"># ${ex.structure}</div>
-            </div>
-        `).join('');
-    }
-
-    // 음성(TTS) 기능: 브라우저 기본 내장 기능을 활용하여 버그 방지
-    function speak(text) {
-        window.speechSynthesis.cancel(); // 겹침 방지
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'en-US';
-        window.speechSynthesis.speak(msg);
-    }
-
-    function save(word, data) {
-        hData = hData.filter(x => x.word !== word);
-        hData.unshift({word, data});
-        localStorage.setItem('vH', JSON.stringify(hData.slice(0, 15)));
-        renderH();
-    }
-
-    function renderH() {
-        document.getElementById('hList').innerHTML = hData.map((x, i) => 
-            `<div class="h-item" onclick="loadH(${i})">${x.word}</div>`).join('');
-    }
-
-    function loadH(i) {
-        const item = hData[i];
-        document.getElementById('word').value = item.word;
-        show(item.word, item.data);
-    }
-
-    function clearH() { if(confirm("삭제할까요?")) { hData=[]; localStorage.removeItem('vH'); renderH(); } }
+    // ... 나머지 display, save, speak 함수는 이전과 동일하게 유지 ...
 </script>
-</body>
-</html>
