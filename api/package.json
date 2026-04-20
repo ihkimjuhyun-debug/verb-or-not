@@ -1,7 +1,7 @@
 {
-  "name": "verb-master-pro-2026",
-  "version": "1.1.0",
-  "description": "AI Verb & Phrasal Verb Analyzer",
+  "name": "verb-master-pro-storage",
+  "version": "1.2.0",
+  "description": "AI Verb Analyzer with Persistent Storage",
   "main": "api/generate.js",
   "dependencies": {
     "node-fetch": "^3.3.2"
