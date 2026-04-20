@@ -2,55 +2,45 @@ export default async function handler(req, res) {
   const { word, difficulty, count } = req.query;
   const apiKey = process.env.OPENAI_API_KEY;
 
-  // 1. API 키 체크 (설정 안 되어 있으면 바로 알려줌)
   if (!apiKey) {
-    return res.status(500).json({ 
-      error: "API_KEY_MISSING", 
-      message: "Vercel 설정에 OPENAI_API_KEY가 입력되지 않았습니다." 
-    });
+    return res.status(500).json({ error: "KEY_NOT_FOUND", message: "Vercel 설정에 API 키가 없습니다." });
   }
 
-  const prompt = `Analyze "${word}". JSON only. 1.type 2.following_form 3.is_separable 4.examples (${count} for ${difficulty}). Daily life.`;
+  const prompt = `Analyze "${word}". 
+  1. Structure: Phrasal verb or standard verb?
+  2. Following Form: Noun, Gerund(-ing), or Base Verb?
+  3. "To" Analysis: If "to" exists, is it a Preposition or To-Infinitive?
+  4. Separability: If phrasal, can it be separated (e.g., "give it up")?
+  5. Examples: Generate ${count} sentences for level ${difficulty}.
+  * IMPORTANT: Use 100% daily life scenarios. If separable, include one example like "${word.split(' ')[0]} you ${word.split(' ')[1] || ''}".
+  
+  Return ONLY JSON format:
+  {
+    "analysis": { "type": "", "next": "", "to_type": "", "separable": "" },
+    "examples": [ {"eng": "", "kor": "", "is_sep": true/false} ]
+  }`;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json", 
-        "Authorization": `Bearer ${apiKey}` 
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.3,
+        temperature: 0.4
       }),
     });
 
-    const rawData = await response.json();
+    const raw = await response.json();
+    if (raw.error) return res.status(500).json({ error: "AI_ERROR", message: raw.error.message });
 
-    // 2. OpenAI 측 에러 발생 시 처리 (할당량 초과 등)
-    if (rawData.error) {
-      return res.status(response.status).json({ 
-        error: "AI_SERVICE_ERROR", 
-        message: rawData.error.message 
-      });
-    }
-
-    let content = rawData.choices[0].message.content;
+    let content = raw.choices[0].message.content;
+    // JSON만 쏙 뽑아내는 정규식 (마크다운 무시)
+    const match = content.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("JSON_NOT_FOUND");
     
-    // 3. JSON 추출 로직 (더 정교하게 수정)
-    const jsonStart = content.indexOf('{');
-    const jsonEnd = content.lastIndexOf('}') + 1;
-    if (jsonStart === -1 || jsonEnd === 0) throw new Error("JSON_FORMAT_ERROR");
-    
-    const cleanJson = content.substring(jsonStart, jsonEnd);
-    res.status(200).json(JSON.parse(cleanJson));
-
-  } catch (error) {
-    res.status(500).json({ 
-      error: "PARSING_FAILED", 
-      message: "AI의 응답을 해석하는 데 실패했습니다.",
-      details: error.message 
-    });
+    res.status(200).json(JSON.parse(match[0]));
+  } catch (err) {
+    res.status(500).json({ error: "SYSTEM_ERROR", message: err.message });
   }
 }
