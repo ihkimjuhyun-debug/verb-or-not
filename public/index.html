@@ -3,48 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verb Master Pro</title>
+    <title>Verb Master Pro (KR/EN)</title>
     <style>
-        :root { --main: #4f46e5; --sub: #f8fafc; --text: #1e293b; }
-        body { font-family: 'Pretendard', sans-serif; background: #eff6ff; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        :root { --main: #4f46e5; --sub: #f8fafc; --text: #1e293b; --accent: #ec4899; }
+        body { font-family: 'Pretendard', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; display: flex; justify-content: center; }
         
-        .container { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 20px; }
-        .card { background: white; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .card { background: white; border-radius: 24px; padding: 28px; box-shadow: 0 12px 45px rgba(0,0,0,0.08); }
         
-        h1 { margin: 0 0 20px 0; font-size: 24px; text-align: center; color: var(--main); letter-spacing: -1px; }
+        h1 { margin: 0 0 5px 0; font-size: 26px; text-align: center; color: var(--main); }
+        .sub-title { text-align: center; color: #64748b; font-size: 14px; margin-bottom: 25px; }
 
-        /* 검색 영역 - 세로 정렬 최적화 */
-        .search-area { display: flex; flex-direction: column; gap: 10px; }
+        .search-area { display: flex; flex-direction: column; gap: 12px; }
         .row { display: flex; gap: 10px; }
         input { flex: 1; padding: 15px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 16px; outline: none; }
         input:focus { border-color: var(--main); }
-        select { padding: 10px; border-radius: 16px; border: 2px solid #e2e8f0; background: white; font-weight: bold; }
+        select { padding: 10px; border-radius: 16px; border: 2px solid #e2e8f0; background: white; font-weight: 600; }
         
-        /* 분석하기 버튼 (절대 안 꺾임) */
         .btn-main { 
             width: 100%; padding: 16px; background: var(--main); color: white; border: none; 
-            border-radius: 16px; font-size: 17px; font-weight: 800; cursor: pointer; 
-            white-space: nowrap; transition: 0.2s;
+            border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; 
+            white-space: nowrap; transition: 0.2s; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
         }
         .btn-main:active { transform: scale(0.97); }
 
-        /* 분석 그리드 */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; display: none; }
-        .pill { background: #f1f5f9; padding: 12px; border-radius: 16px; border: 1px solid #e2e8f0; }
-        .pill-label { font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 3px; }
-        .pill-val { font-size: 13px; font-weight: 700; color: #334155; }
+        /* 분석 그리드 디자인 수정 */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 25px 0; display: none; }
+        .pill { background: #f8fafc; padding: 15px; border-radius: 18px; border: 1px solid #e2e8f0; }
+        .pill-label { font-size: 11px; color: #64748b; font-weight: 800; margin-bottom: 5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; }
+        .pill-val { font-size: 14px; font-weight: 700; color: #334155; line-height: 1.3; }
 
-        /* 예문 리스트 */
-        .ex-card { background: #fff; padding: 18px; border-radius: 18px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; }
-        .eng { font-size: 17px; font-weight: 700; color: #0f172a; padding-right: 40px; line-height: 1.4; }
-        .kor { color: #64748b; font-size: 14px; margin-top: 6px; }
-        .speak-btn { position: absolute; right: 15px; top: 18px; border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; }
-        .badge { display: inline-block; padding: 3px 8px; font-size: 10px; border-radius: 6px; background: #dcfce7; color: #166534; font-weight: bold; margin-top: 10px; }
+        /* 예문 스타일 */
+        .ex-card { background: #fff; padding: 20px; border-radius: 20px; border: 1px solid #f1f5f9; margin-bottom: 15px; position: relative; transition: 0.3s; }
+        .ex-card:hover { border-color: var(--main); transform: translateY(-2px); }
+        .eng { font-size: 18px; font-weight: 700; color: #0f172a; padding-right: 45px; line-height: 1.5; }
+        .kor { color: #475569; font-size: 15px; margin-top: 8px; }
+        .speak-btn { position: absolute; right: 15px; top: 20px; border: none; background: #eef2ff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--main); }
+        .badge { display: inline-block; padding: 4px 10px; font-size: 11px; border-radius: 8px; background: #ecfdf5; color: #065f46; font-weight: bold; margin-top: 12px; }
 
         /* 하단 기록장 */
-        .history { background: white; border-radius: 20px; padding: 20px; }
-        .h-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .h-item { padding: 8px 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--main); }
+        .history { background: white; border-radius: 24px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .h-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .h-item { padding: 10px 18px; background: #f1f5f9; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--main); border: 1px solid transparent; transition: 0.2s; }
+        .h-item:hover { border-color: var(--main); background: #eef2ff; }
 
         .status { display: none; text-align: center; font-weight: bold; padding: 20px; border-radius: 16px; margin-top: 10px; }
     </style>
@@ -53,31 +54,32 @@
 
 <div class="container">
     <div class="card">
-        <h1>🔍 Phrasal Verb Pro</h1>
+        <h1>🔍 Verb Master Pro</h1>
+        <div class="sub-title">영어 동사 및 구동사 완벽 분석 도구</div>
         
         <div class="search-area">
             <div class="row">
-                <input type="text" id="word" placeholder="단어/구동사 (예: add to, give up)">
+                <input type="text" id="word" placeholder="단어/구동사 (예: apply to, look for)">
                 <select id="diff">
-                    <option value="Easy">Easy</option>
-                    <option value="Medium" selected>Med</option>
-                    <option value="Hard">Hard</option>
+                    <option value="Easy">초급</option>
+                    <option value="Medium" selected>중급</option>
+                    <option value="Hard">고급</option>
                 </select>
                 <select id="count">
                     <option value="3">3개</option>
                     <option value="5">5개</option>
                 </select>
             </div>
-            <button class="btn-main" onclick="run()">분석하기</button>
+            <button class="btn-main" onclick="run()">분석하기 (Analyze)</button>
         </div>
 
         <div id="status" class="status"></div>
 
         <div id="grid" class="grid">
-            <div class="pill"><div class="pill-label">유형</div><div id="v1" class="pill-val"></div></div>
-            <div class="pill"><div class="pill-label">다음 형태</div><div id="v2" class="pill-val"></div></div>
-            <div class="pill"><div class="pill-label">to의 정체</div><div id="v3" class="pill-val"></div></div>
-            <div class="pill"><div class="pill-label">중간 삽입</div><div id="v4" class="pill-val"></div></div>
+            <div class="pill"><div class="pill-label">동사 종류 (Verb Type)</div><div id="v1" class="pill-val"></div></div>
+            <div class="pill"><div class="pill-label">다음 형태 (Following Form)</div><div id="v2" class="pill-val"></div></div>
+            <div class="pill"><div class="pill-label">To의 정체 (To Analysis)</div><div id="v3" class="pill-val"></div></div>
+            <div class="pill"><div class="pill-label">중간 삽입 (Separability)</div><div id="v4" class="pill-val"></div></div>
         </div>
 
         <div id="exArea"></div>
@@ -85,15 +87,15 @@
 
     <div class="history">
         <div style="display:flex; justify-content:space-between; align-items:center">
-            <h3 style="margin:0; font-size:16px;">📂 학습 기록</h3>
-            <span onclick="resetH()" style="font-size:11px; color:#ef4444; cursor:pointer;">전체 삭제</span>
+            <h3 style="margin:0; font-size:18px;">📂 최근 학습 기록</h3>
+            <span onclick="resetH()" style="font-size:12px; color:#ef4444; cursor:pointer; font-weight:bold;">전체 삭제</span>
         </div>
         <div id="hList" class="h-list"></div>
     </div>
 </div>
 
 <script>
-    let history = JSON.parse(localStorage.getItem('verbHistory') || '[]');
+    let history = JSON.parse(localStorage.getItem('verbHistoryV2') || '[]');
     updateH();
 
     async function run() {
@@ -107,9 +109,9 @@
         const exArea = document.getElementById('exArea');
 
         status.style.display = 'block';
-        status.style.background = '#f1f5f9';
+        status.style.background = '#eef2ff';
         status.style.color = '#4f46e5';
-        status.innerText = 'AI 분석 엔진 가동 중...';
+        status.innerText = 'AI가 문법 구조를 분석 중입니다...';
         grid.style.display = 'none';
         exArea.innerHTML = '';
 
@@ -125,7 +127,7 @@
         } catch (e) {
             status.style.background = '#fef2f2';
             status.style.color = '#ef4444';
-            status.innerHTML = `<strong>에러 발생</strong><br><small>${e.message}</small>`;
+            status.innerHTML = `<strong>분석 오류</strong><br><small>${e.message}</small>`;
         }
     }
 
@@ -133,7 +135,7 @@
         document.getElementById('grid').style.display = 'grid';
         document.getElementById('v1').innerText = data.analysis.type;
         document.getElementById('v2').innerText = data.analysis.next;
-        document.getElementById('v3').innerText = data.analysis.to_type || '해당 없음';
+        document.getElementById('v3').innerText = data.analysis.to_type || '해당 없음 (N/A)';
         document.getElementById('v4').innerText = data.analysis.separable;
 
         document.getElementById('exArea').innerHTML = data.examples.map(ex => `
@@ -141,7 +143,7 @@
                 <div class="eng">${ex.eng}</div>
                 <div class="kor">${ex.kor}</div>
                 <button class="speak-btn" onclick="speak('${ex.eng.replace(/'/g, "")}')">🔊</button>
-                ${ex.is_sep ? '<div class="badge">💡 목적어 삽입됨</div>' : ''}
+                ${ex.is_sep ? '<div class="badge">💡 목적어 삽입 (Separated)</div>' : ''}
             </div>
         `).join('');
     }
@@ -150,13 +152,14 @@
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(txt);
         u.lang = 'en-US';
+        u.rate = 0.9; // 조금 더 천천히 읽어줌
         window.speechSynthesis.speak(u);
     }
 
     function save(word, data) {
         history = history.filter(h => h.word !== word);
         history.unshift({word, data});
-        localStorage.setItem('verbHistory', JSON.stringify(history.slice(0, 15)));
+        localStorage.setItem('verbHistoryV2', JSON.stringify(history.slice(0, 15)));
         updateH();
     }
 
@@ -171,7 +174,7 @@
         render(item.word, item.data);
     }
 
-    function resetH() { if(confirm("기록을 비울까요?")) { history=[]; localStorage.clear(); updateH(); } }
+    function resetH() { if(confirm("학습 기록을 모두 삭제할까요?")) { history=[]; localStorage.clear(); updateH(); } }
 </script>
 </body>
 </html>
