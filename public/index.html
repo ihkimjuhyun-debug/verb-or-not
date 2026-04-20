@@ -3,167 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verb Master Pro - Storage</title>
+    <title>Verb Pro: Phrasal Verb Master</title>
     <style>
-        :root { --primary: #4f46e5; --bg: #f3f4f6; --white: #ffffff; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); padding: 20px; color: #1f2937; }
-        .container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
-
-        .main-panel, .storage-panel { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input { flex: 1; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; }
-        button { padding: 12px 20px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
-
-        .analysis-card { background: #fdf2f8; border: 1px solid #fbcfe8; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: none; }
-        .example-item { border-bottom: 1px solid #f3f4f6; padding: 12px 0; }
-        .example-item:last-child { border: none; }
-        .eng { font-weight: 700; color: #111827; }
-        .kor { color: #6b7280; font-size: 0.95rem; }
-
-        /* 저장소 스타일 */
-        .storage-panel h3 { margin-top: 0; display: flex; justify-content: space-between; }
-        .vocab-list { list-style: none; padding: 0; max-height: 500px; overflow-y: auto; }
-        .vocab-item { 
-            padding: 10px; border-bottom: 1px solid #f3f4f6; cursor: pointer; 
-            display: flex; justify-content: space-between; align-items: center;
+        :root { 
+            --primary: #4f46e5; --secondary: #ec4899; 
+            --success: #10b981; --warning: #f59e0b; 
+            --bg: #f8fafc; --card: #ffffff;
         }
-        .vocab-item:hover { background: #f9fafb; }
-        .vocab-word { font-weight: 600; color: var(--primary); }
-        .vocab-date { font-size: 0.75rem; color: #9ca3af; }
-        .del-btn { color: #ef4444; font-size: 0.8rem; border: none; background: none; cursor: pointer; }
+        body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 320px; gap: 25px; }
+        @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
 
-        .loading { display: none; text-align: center; font-weight: bold; color: var(--primary); margin: 20px 0; }
+        /* 디자인 복구 및 강화 */
+        .glass-card { background: var(--card); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        h1 { margin: 0 0 10px 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .search-area { display: flex; gap: 10px; margin-bottom: 25px; }
+        input { flex: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; }
+        button.main-btn { padding: 0 25px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
+
+        /* 문법 분석 정보창 */
+        .analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; display: none; }
+        .info-pill { padding: 15px; border-radius: 15px; background: #f1f5f9; border: 1px solid #e2e8f0; text-align: center; }
+        .pill-label { font-size: 0.75rem; color: #64748b; margin-bottom: 5px; font-weight: bold; }
+        .pill-value { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+
+        /* 예문 스타일 */
+        .example-list { margin-top: 20px; }
+        .example-card { padding: 18px; border-radius: 12px; background: #fff; border: 1px solid #f1f5f9; margin-bottom: 12px; transition: 0.2s; }
+        .example-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .eng-text { font-size: 1.2rem; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+        .kor-text { color: #64748b; font-size: 0.95rem; }
+        .structure-tag { display: inline-block; padding: 2px 8px; font-size: 0.7rem; border-radius: 5px; margin-top: 8px; background: #dcfce7; color: #166534; font-weight: bold; }
+
+        /* 저장소 패널 */
+        .storage-panel { background: #fff; border-radius: 20px; padding: 20px; height: fit-content; border: 1px solid #e2e8f0; }
+        .storage-item { padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; justify-content: space-between; }
+        .storage-item:hover { background: #f8fafc; }
+
+        .loading { display: none; text-align: center; font-weight: bold; color: var(--primary); margin: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="main-panel">
-        <h2>🔍 단어 분석 & 예문</h2>
-        <div class="input-group">
-            <input type="text" id="word" placeholder="단어 입력 (예: put off, apply to)">
-            <select id="diff">
+    <div class="glass-card">
+        <h1>✨ Phrasal Verb Analyzer</h1>
+        <p style="color: #64748b; margin-bottom: 30px;">구동사 분리 예문부터 뒤에 오는 품사까지 한눈에 분석합니다.</p>
+
+        <div class="search-area">
+            <input type="text" id="wordInput" placeholder="예: give up, carry out, put off">
+            <select id="diffSelect" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0;">
                 <option value="Easy">Easy</option>
-                <option value="Medium" selected>Medium</option>
+                <option value="Medium">Medium</option>
                 <option value="Hard">Hard</option>
             </select>
-            <button onclick="fetchData()">분석 시작</button>
+            <button class="main-btn" onclick="analyze()">분석하기</button>
         </div>
 
-        <div id="loading" class="loading">AI가 분석 중...</div>
+        <div id="loader" class="loading">AI가 문법 구조를 해체하고 있습니다...</div>
 
-        <div id="analysisArea" class="analysis-card">
-            <h4 id="targetWord" style="margin:0 0 10px 0; color: #be185d;"></h4>
-            <div id="grammarInfo"></div>
+        <div id="analysisResult" class="analysis-grid">
+            <div class="info-pill">
+                <div class="pill-label">유형</div>
+                <div id="resType" class="pill-value">-</div>
+            </div>
+            <div class="info-pill" style="background: #fff1f2;">
+                <div class="pill-label">뒤에 오는 단어</div>
+                <div id="resFollow" class="pill-value">-</div>
+            </div>
+            <div class="info-pill" style="background: #f0f9ff;">
+                <div class="pill-label">중간 삽입 가능</div>
+                <div id="resSeparable" class="pill-value">-</div>
+            </div>
         </div>
 
-        <div id="resultArea"></div>
+        <div id="exampleArea" class="example-list"></div>
     </div>
 
     <div class="storage-panel">
-        <h3>📚 나의 단어장 <button onclick="clearStorage()" style="font-size: 10px; background: #9ca3af;">전체삭제</button></h3>
-        <ul id="vocabList" class="vocab-list">
-            </ul>
+        <h3 style="margin-top: 0;">📚 학습 기록</h3>
+        <div id="historyList"></div>
+        <button onclick="clearAll()" style="width: 100%; margin-top: 15px; padding: 8px; border-radius: 8px; border: none; background: #fee2e2; color: #dc2626; cursor: pointer;">기록 전체 삭제</button>
     </div>
 </div>
 
 <script>
-    // 1. 초기 데이터 로드
-    let storage = JSON.parse(localStorage.getItem('myVocab') || '[]');
-    renderVocabList();
+    let history = JSON.parse(localStorage.getItem('verbHistory') || '[]');
+    renderHistory();
 
-    async function fetchData() {
-        const word = document.getElementById('word').value.trim();
-        const diff = document.getElementById('diff').value;
+    async function analyze() {
+        const word = document.getElementById('wordInput').value.trim();
+        const diff = document.getElementById('diffSelect').value;
         if(!word) return;
 
-        toggleLoading(true);
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('analysisResult').style.display = 'none';
+        document.getElementById('exampleArea').innerHTML = '';
 
         try {
-            const res = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=3`);
-            const data = await res.json();
+            const response = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=5`);
+            const data = await response.json();
             
-            displayResult(word, data);
-            saveToStorage(word, data);
+            showData(word, data);
+            saveHistory(word, data);
         } catch (e) {
-            alert("분석 실패");
+            alert("분석 중 오류가 발생했습니다.");
         } finally {
-            toggleLoading(false);
+            document.getElementById('loader').style.display = 'none';
         }
     }
 
-    function displayResult(word, data) {
-        // 분석 결과 표시
+    function showData(word, data) {
         const info = data.grammar_analysis;
-        document.getElementById('analysisArea').style.display = 'block';
-        document.getElementById('targetWord').innerText = word.toUpperCase();
-        document.getElementById('grammarInfo').innerHTML = `
-            <div><strong>유형:</strong> ${info.type}</div>
-            <div style="color:#e11d48"><strong>"to" 성격:</strong> ${info.to_type}</div>
-            <div><strong>팁:</strong> ${info.usage_tip}</div>
-        `;
+        document.getElementById('analysisResult').style.display = 'grid';
+        document.getElementById('resType').innerText = info.type;
+        document.getElementById('resFollow').innerText = info.following_form;
+        document.getElementById('resSeparable').innerText = info.is_separable;
 
-        // 예문 표시
-        const resultArea = document.getElementById('resultArea');
-        resultArea.innerHTML = '<h4>📝 예문 (Daily Life)</h4>' + data.examples.map(ex => `
-            <div class="example-item">
-                <div class="eng">${ex.eng}</div>
-                <div class="kor">${ex.kor}</div>
-                <div style="font-size:0.8rem; color:#10b981;">💡 ${ex.point}</div>
+        document.getElementById('exampleArea').innerHTML = '<h3>📝 실전 대화 예문</h3>' + data.examples.map(ex => `
+            <div class="example-card">
+                <div class="eng-text">${highlightWord(ex.eng, word)}</div>
+                <div class="kor-text">${ex.kor}</div>
+                <div class="structure-tag">${ex.structure === 'separated' ? '💡 중간에 목적어 삽입됨' : '정석 구조'}</div>
             </div>
         `).join('');
     }
 
-    // 2. 저장소 로직
-    function saveToStorage(word, fullData) {
-        // 중복 제거 후 저장
-        storage = storage.filter(item => item.word !== word);
-        storage.unshift({
-            word: word,
-            data: fullData,
-            date: new Date().toLocaleDateString()
-        });
-        localStorage.setItem('myVocab', JSON.stringify(storage));
-        renderVocabList();
+    function highlightWord(sentence, word) {
+        // 단어 강조 로직 (간단화)
+        return sentence.replace(new RegExp(word, 'gi'), `<strong>$&</strong>`);
     }
 
-    function renderVocabList() {
-        const list = document.getElementById('vocabList');
-        list.innerHTML = storage.map((item, index) => `
-            <li class="vocab-item" onclick="loadFromStorage(${index})">
-                <div>
-                    <div class="vocab-word">${item.word}</div>
-                    <div class="vocab-date">${item.date}</div>
-                </div>
-                <button class="del-btn" onclick="deleteItem(event, ${index})">삭제</button>
-            </li>
+    function saveHistory(word, data) {
+        history = history.filter(h => h.word !== word);
+        history.unshift({word, data, date: new Date().toLocaleDateString()});
+        localStorage.setItem('verbHistory', JSON.stringify(history.slice(0, 30)));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        document.getElementById('historyList').innerHTML = history.map((h, i) => `
+            <div class="storage-item" onclick="loadHistory(${i})">
+                <span style="font-weight: bold; color: var(--primary);">${h.word}</span>
+                <span style="font-size: 0.8rem; color: #94a3b8;">${h.date}</span>
+            </div>
         `).join('');
     }
 
-    function loadFromStorage(index) {
-        const item = storage[index];
-        displayResult(item.word, item.data);
+    function loadHistory(index) {
+        const item = history[index];
+        document.getElementById('wordInput').value = item.word;
+        showData(item.word, item.data);
     }
 
-    function deleteItem(e, index) {
-        e.stopPropagation(); // 부모 클릭 이벤트 방지
-        storage.splice(index, 1);
-        localStorage.setItem('myVocab', JSON.stringify(storage));
-        renderVocabList();
-    }
-
-    function clearStorage() {
-        if(confirm("모든 단어를 삭제할까요?")) {
-            storage = [];
-            localStorage.setItem('myVocab', '[]');
-            renderVocabList();
+    function clearAll() {
+        if(confirm("모든 기록을 삭제하시겠습니까?")) {
+            history = [];
+            localStorage.clear();
+            renderHistory();
         }
-    }
-
-    function toggleLoading(show) {
-        document.getElementById('loading').style.display = show ? 'block' : 'none';
     }
 </script>
 
