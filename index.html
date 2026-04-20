@@ -2,117 +2,108 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Verb Context Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verb Master Pro</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; padding: 20px; background: #f4f7f6; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
-        
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        input { flex: 2; min-width: 200px; }
-        button { padding: 12px 25px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #2980b9; }
-
-        .result-section { margin-top: 30px; border-top: 2px solid #eee; pt: 20px; }
-        .example-card { background: #f8f9fa; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 10px; border-radius: 4px; }
-        .eng { font-size: 18px; font-weight: 600; color: #2c3e50; }
-        .kor { color: #7f8c8d; margin-top: 5px; }
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-bottom: 5px; background: #e0e0e0; }
-
-        .history-section { margin-top: 40px; }
-        .history-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+        :root { --primary: #4f46e5; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 2rem; border-radius: 1rem; shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .input-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; flex: 1; }
+        button { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        button:disabled { background: #9ca3af; }
+        .card { border-left: 4px solid var(--primary); padding: 15px; background: #fff; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 0 8px 8px 0; }
+        .eng { font-size: 1.1rem; font-weight: bold; color: #1e293b; }
+        .kor { color: #64748b; margin-top: 5px; }
+        .desc { font-size: 0.85rem; color: #94a3b8; margin-top: 8px; font-style: italic; }
+        .history-list { margin-top: 30px; font-size: 0.9rem; border-top: 1px solid #eee; pt: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🔍 Verb Context Master</h1>
-    
-    <div class="input-group">
-        <input type="text" id="wordInput" placeholder="단어나 숙어를 입력하세요 (예: add to)">
-        <select id="difficulty">
-            <option value="Easy">쉬움 (초급)</option>
-            <option value="Medium">중간 (중급)</option>
-            <option value="Hard">어려움 (고급)</option>
+    <h2>🚀 Verb Master Pro</h2>
+    <p>단어를 입력하면 동사 활용 예문을 생성합니다.</p>
+
+    <div class="input-box">
+        <input type="text" id="word" placeholder="예: add to, take over...">
+        <select id="diff">
+            <option value="Easy">쉬움</option>
+            <option value="Medium">중간</option>
+            <option value="Hard">어려움</option>
         </select>
         <select id="count">
             <option value="3">3개</option>
             <option value="5">5개</option>
-            <option value="7">7개</option>
             <option value="10">10개</option>
         </select>
-        <button onclick="generateExamples()">예문 보기 & 저장</button>
+        <button id="btn" onclick="fetchData()">생성</button>
     </div>
 
-    <div id="resultArea" class="result-section">
-        </div>
+    <div id="loading" style="display:none;">AI가 예문을 생각 중입니다...</div>
+    <div id="results"></div>
 
-    <div class="history-section">
-        <h3>📂 최근 검색 기록 (Local Storage)</h3>
-        <div id="historyList"></div>
+    <div class="history-list">
+        <h3>📂 검색 기록</h3>
+        <div id="history"></div>
     </div>
 </div>
 
 <script>
-    // 로컬 스토리지에서 기록 불러오기
-    let searchHistory = JSON.parse(localStorage.getItem('verbHistory')) || [];
-
-    function generateExamples() {
-        const word = document.getElementById('wordInput').value;
-        const diff = document.getElementById('difficulty').value;
+    async function fetchData() {
+        const word = document.getElementById('word').value;
+        const diff = document.getElementById('diff').value;
         const count = document.getElementById('count').value;
+        const btn = document.getElementById('btn');
+        
+        if(!word) return alert("단어를 입력하세요!");
 
-        if (!word) { alert('단어를 입력해주세요!'); return; }
+        btn.disabled = true;
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('results').innerHTML = '';
 
-        // 1. 결과 화면 구성 (실제로는 API에서 데이터를 받아오는 부분)
-        // 여기서는 구조를 보여드리기 위해 Mock 데이터를 생성합니다.
-        const resultArea = document.getElementById('resultArea');
-        resultArea.innerHTML = `<h2>"${word}" 학습 결과 (${diff})</h2>`;
+        try {
+            // 우리 서버리스 API 호출 (보안 유지)
+            const response = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=${count}`);
+            const data = await response.json();
 
-        for (let i = 1; i <= count; i++) {
-            const card = document.createElement('div');
-            card.className = 'example-card';
-            card.innerHTML = `
-                <div class="badge">${diff} Level - Example ${i}</div>
-                <div class="eng">This is a sample sentence for <strong>${word}</strong> #${i}.</div>
-                <div class="kor">이것은 <strong>${word}</strong>를 위한 #${i}번째 샘플 예문입니다.</div>
-            `;
-            resultArea.appendChild(card);
+            renderResults(data);
+            saveToHistory(word, data);
+        } catch (e) {
+            alert("오류가 발생했습니다.");
+        } finally {
+            btn.disabled = false;
+            document.getElementById('loading').style.display = 'none';
         }
+    }
 
-        // 2. 기록 저장 로직
-        const searchItem = {
-            word: word,
-            level: diff,
-            count: count,
-            date: new Date().toLocaleString()
-        };
-        
-        searchHistory.unshift(searchItem); // 최신순 정렬
-        if (searchHistory.length > 10) searchHistory.pop(); // 최대 10개 저장
-        
-        localStorage.setItem('verbHistory', JSON.stringify(searchHistory));
+    function renderResults(data) {
+        const container = document.getElementById('results');
+        data.forEach(item => {
+            container.innerHTML += `
+                <div class="card">
+                    <div class="eng">${item.eng}</div>
+                    <div class="kor">${item.kor}</div>
+                    <div class="desc">💡 ${item.desc}</div>
+                </div>
+            `;
+        });
+    }
+
+    function saveToHistory(word, results) {
+        let history = JSON.parse(localStorage.getItem('verbHistory') || '[]');
+        history.unshift({ word, date: new Date().toLocaleString(), results });
+        localStorage.setItem('verbHistory', JSON.stringify(history.slice(0, 20))); // 최근 20개 저장
         renderHistory();
     }
 
     function renderHistory() {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-        searchHistory.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            div.innerHTML = `
-                <span><strong>${item.word}</strong> (${item.level}) - ${item.count}개</span>
-                <span style="color: #999;">${item.date}</span>
-            `;
-            historyList.appendChild(div);
-        });
+        const histDiv = document.getElementById('history');
+        const history = JSON.parse(localStorage.getItem('verbHistory') || '[]');
+        histDiv.innerHTML = history.map(h => `<div><strong>${h.word}</strong> (${h.date})</div>`).join('');
     }
 
-    // 페이지 로드 시 기록 표시
     renderHistory();
 </script>
-
 </body>
 </html>
