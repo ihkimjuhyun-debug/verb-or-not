@@ -4,23 +4,25 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.OPENAI_API_KEY;
 
-  // 보편적인 일상 대화 예문을 생성하도록 지시 (사용자 수정 사항 반영)
   const prompt = `Analyze the English phrase "${word}".
-  1. Determine if it's a phrasal verb and its grammar structure.
-  2. If it has "to", specify if it's a Preposition or To-Infinitive.
+  1. Determine the grammar: Is it a Phrasal Verb? What form follows it (Noun, Gerund, or Base Verb)?
+  2. Separability: If it's a phrasal verb, can it be separated (e.g., "give IT up")? 
   3. Generate ${count} examples for level ${difficulty}.
+  4. CRITICAL: If separable, provide at least one example with a pronoun/noun in the middle (e.g., "give you up").
   
-  CRITICAL: Use ONLY universal 100% daily-life conversation scenarios. Avoid niche topics like professional sports, powerlifting, or technical coding unless specifically asked.
+  Use 100% daily-life conversation scenarios.
 
-  Format:
+  Format JSON:
   {
     "grammar_analysis": {
-      "type": "type",
-      "to_type": "Preposition / To-Infinitive / N/A",
-      "next_form": "form",
+      "type": "type of verb",
+      "following_form": "Noun / Gerund(-ing) / Base Verb / etc",
+      "is_separable": "Yes/No",
       "usage_tip": "tip"
     },
-    "examples": [{"eng": "...", "kor": "...", "point": "..."}]
+    "examples": [
+      {"eng": "...", "kor": "...", "structure": "normal or separated"}
+    ]
   }`;
 
   try {
@@ -40,6 +42,6 @@ export default async function handler(req, res) {
     const data = await response.json();
     res.status(200).json(JSON.parse(data.choices[0].message.content));
   } catch (error) {
-    res.status(500).json({ error: "AI Analysis Failed" });
+    res.status(500).json({ error: "AI 분석 실패" });
   }
 }
