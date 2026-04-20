@@ -3,165 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verb Master Pro</title>
+    <title>Verb Master Pro v2</title>
     <style>
-        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; }
+        :root { --primary: #6366f1; --bg: #f1f5f9; --white: #ffffff; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
         
-        .container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 20px; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .glass-card { background: var(--white); border-radius: 24px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         
-        /* 메인 카드 디자인 */
-        .glass-card { background: var(--card); border-radius: 24px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        h1 { margin: 0 0 10px 0; font-size: 28px; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h1 { margin: 0 0 15px 0; font-size: 24px; text-align: center; color: var(--primary); }
 
-        /* 검색 영역 수정 */
-        .search-area { display: flex; gap: 10px; margin-bottom: 25px; align-items: stretch; }
-        input { flex: 3; padding: 14px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 16px; min-width: 0; }
-        select { flex: 1; padding: 10px; border-radius: 14px; border: 2px solid #e2e8f0; background: white; cursor: pointer; }
+        /* 입력창 세로 정렬 및 버튼 고정 */
+        .search-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .input-row { display: flex; gap: 10px; }
+        input { flex: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 16px; }
+        select { width: 100px; padding: 10px; border-radius: 14px; border: 2px solid #e2e8f0; }
         
-        /* 분석하기 버튼 수정 (세로 꺾임 방지) */
         .main-btn { 
-            white-space: nowrap; /* 글자 꺾임 방지 */
-            padding: 0 25px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 14px; 
-            font-weight: bold; 
-            cursor: pointer;
-            transition: transform 0.2s;
+            width: 100%; padding: 15px; background: var(--primary); color: white; 
+            border: none; border-radius: 14px; font-weight: 800; font-size: 16px;
+            cursor: pointer; transition: 0.2s; white-space: nowrap;
         }
-        .main-btn:hover { transform: scale(1.02); }
+        .main-btn:active { transform: scale(0.98); }
 
-        /* 인포 섹션 */
-        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; display: none; }
-        .pill { background: #f1f5f9; padding: 12px; border-radius: 16px; text-align: center; border: 1px solid #e2e8f0; }
-        .pill-label { font-size: 11px; color: #64748b; font-weight: bold; margin-bottom: 4px; }
-        .pill-value { font-size: 14px; font-weight: 800; color: var(--primary); }
+        /* 분석 결과창 */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; display: none; }
+        .pill { background: #f8fafc; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
+        .pill-label { font-size: 10px; color: #94a3b8; font-weight: bold; }
+        .pill-value { font-size: 13px; font-weight: 700; color: #1e293b; }
 
-        /* 예문 카드 */
-        .example-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .eng { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
-        .kor { color: #64748b; font-size: 15px; }
-        .tag { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #e0e7ff; color: #4338ca; font-size: 11px; font-weight: bold; margin-top: 10px; }
+        /* 예문 카드 + 음성 버튼 */
+        .example-card { background: #fff; padding: 18px; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; }
+        .eng { font-size: 17px; font-weight: 700; color: #1e293b; padding-right: 35px; }
+        .kor { color: #64748b; font-size: 14px; margin-top: 4px; }
+        .speak-btn { position: absolute; right: 15px; top: 18px; cursor: pointer; font-size: 20px; background: none; border: none; }
 
-        /* 학습 기록 (하단 이동) */
-        .history-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; }
-        .history-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .history-list { display: flex; flex-wrap: wrap; gap: 8px; }
-        .history-item { padding: 8px 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; cursor: pointer; font-size: 14px; }
-        .history-item:hover { border-color: var(--primary); background: #eff6ff; }
+        /* 학습 기록 (하단 정렬) */
+        .history-section { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; }
+        .history-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .h-item { padding: 6px 12px; background: #eff6ff; color: var(--primary); border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
 
-        .loading { display: none; text-align: center; padding: 20px; color: var(--primary); font-weight: bold; }
+        .loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="glass-card">
-        <h1>✨ Phrasal Verb Analyzer</h1>
-        <p style="color: #64748b; margin-top: -5px; margin-bottom: 25px;">구동사 분석 및 문법 구조 확인</p>
-
+        <h1>🔍 Verb Master Pro</h1>
+        
         <div class="search-area">
-            <input type="text" id="wordInput" placeholder="예: give up, look at">
-            <select id="diffSelect">
-                <option value="Easy">Easy</option>
-                <option value="Medium" selected>Med</option>
-                <option value="Hard">Hard</option>
-            </select>
+            <div class="input-row">
+                <input type="text" id="word" placeholder="예: give up, add to">
+                <select id="diff">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Med</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
             <button class="main-btn" onclick="analyze()">분석하기</button>
         </div>
 
-        <div id="loader" class="loading">AI가 문법을 분석하고 있습니다...</div>
+        <div id="loader" class="loader">문법 구조 분석 중...</div>
 
-        <div id="analysisResult" class="analysis-grid">
-            <div class="pill"><div class="pill-label">유형</div><div id="resType" class="pill-value"></div></div>
-            <div class="pill"><div class="pill-label">다음 단어</div><div id="resFollow" class="pill-value"></div></div>
-            <div class="pill"><div class="pill-label">중간 삽입</div><div id="resSep" class="pill-value"></div></div>
+        <div id="resGrid" class="info-grid">
+            <div class="pill"><div class="pill-label">유형</div><div id="r1" class="pill-value"></div></div>
+            <div class="pill"><div class="pill-label">뒤에 오는 형태</div><div id="r2" class="pill-value"></div></div>
+            <div class="pill"><div class="pill-label">중간 삽입</div><div id="r3" class="pill-value"></div></div>
         </div>
 
-        <div id="exampleArea"></div>
+        <div id="exArea"></div>
     </div>
 
-    <div class="history-card">
-        <div class="history-title">
-            <h3 style="margin:0">📚 최근 학습 기록</h3>
-            <button onclick="clearHistory()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px;">전체 삭제</button>
+    <div class="history-section">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:16px;">📚 최근 학습 기록</h3>
+            <span onclick="clearH()" style="font-size:11px; color:#ef4444; cursor:pointer;">전체삭제</span>
         </div>
-        <div id="historyList" class="history-list"></div>
+        <div id="hList" class="history-list"></div>
     </div>
 </div>
 
 <script>
-    let historyData = JSON.parse(localStorage.getItem('verbHistory') || '[]');
-    updateHistoryUI();
+    let hData = JSON.parse(localStorage.getItem('vH') || '[]');
+    renderH();
 
     async function analyze() {
-        const word = document.getElementById('wordInput').value.trim();
-        const diff = document.getElementById('diffSelect').value;
+        const word = document.getElementById('word').value.trim();
+        const diff = document.getElementById('diff').value;
         if(!word) return;
 
         document.getElementById('loader').style.display = 'block';
-        document.getElementById('analysisResult').style.display = 'none';
-        document.getElementById('exampleArea').innerHTML = '';
+        document.getElementById('resGrid').style.display = 'none';
+        document.getElementById('exArea').innerHTML = '';
 
         try {
             const res = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=3`);
-            if(!res.ok) throw new Error("Server Error");
             const data = await res.json();
-            
-            display(word, data);
-            saveHistory(word, data);
+            if(data.error) throw new Error(data.error);
+
+            show(word, data);
+            save(word, data);
         } catch (e) {
-            alert("분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            console.error(e);
+            alert("분석 중 오류가 발생했습니다. (API 키 혹은 파싱 문제)");
         } finally {
             document.getElementById('loader').style.display = 'none';
         }
     }
 
-    function display(word, data) {
-        document.getElementById('analysisResult').style.display = 'grid';
-        document.getElementById('resType').innerText = data.grammar_analysis.type;
-        document.getElementById('resFollow').innerText = data.grammar_analysis.following_form;
-        document.getElementById('resSep').innerText = data.grammar_analysis.is_separable;
+    function show(word, data) {
+        document.getElementById('resGrid').style.display = 'grid';
+        document.getElementById('r1').innerText = data.grammar_analysis.type;
+        document.getElementById('r2').innerText = data.grammar_analysis.following_form;
+        document.getElementById('r3').innerText = data.grammar_analysis.is_separable;
 
-        document.getElementById('exampleArea').innerHTML = data.examples.map(ex => `
+        document.getElementById('exArea').innerHTML = data.examples.map(ex => `
             <div class="example-card">
                 <div class="eng">${ex.eng}</div>
                 <div class="kor">${ex.kor}</div>
-                <div class="tag">${ex.structure === 'separated' ? '💡 목적어 삽입 형태' : '기본 구조'}</div>
+                <button class="speak-btn" onclick="speak('${ex.eng.replace(/'/g, "\\'")}')">🔊</button>
+                <div style="font-size:11px; color:#10b981; margin-top:8px;"># ${ex.structure}</div>
             </div>
         `).join('');
     }
 
-    function saveHistory(word, data) {
-        historyData = historyData.filter(h => h.word !== word);
-        historyData.unshift({word, data});
-        localStorage.setItem('verbHistory', JSON.stringify(historyData.slice(0, 10)));
-        updateHistoryUI();
+    // 음성(TTS) 기능: 브라우저 기본 내장 기능을 활용하여 버그 방지
+    function speak(text) {
+        window.speechSynthesis.cancel(); // 겹침 방지
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
     }
 
-    function updateHistoryUI() {
-        const list = document.getElementById('historyList');
-        list.innerHTML = historyData.map((h, i) => `
-            <div class="history-item" onclick="loadHistory(${i})">${h.word}</div>
-        `).join('');
+    function save(word, data) {
+        hData = hData.filter(x => x.word !== word);
+        hData.unshift({word, data});
+        localStorage.setItem('vH', JSON.stringify(hData.slice(0, 15)));
+        renderH();
     }
 
-    function loadHistory(i) {
-        const item = historyData[i];
-        document.getElementById('wordInput').value = item.word;
-        display(item.word, item.data);
+    function renderH() {
+        document.getElementById('hList').innerHTML = hData.map((x, i) => 
+            `<div class="h-item" onclick="loadH(${i})">${x.word}</div>`).join('');
     }
 
-    function clearHistory() {
-        if(confirm("기록을 삭제할까요?")) {
-            localStorage.removeItem('verbHistory');
-            historyData = [];
-            updateHistoryUI();
-        }
+    function loadH(i) {
+        const item = hData[i];
+        document.getElementById('word').value = item.word;
+        show(item.word, item.data);
     }
+
+    function clearH() { if(confirm("삭제할까요?")) { hData=[]; localStorage.removeItem('vH'); renderH(); } }
 </script>
-
 </body>
 </html>
