@@ -1,16 +1,12 @@
 {
-  "name": "verb-master-pro",
-  "version": "1.0.0",
-  "description": "AI Verb Context Master",
+  "name": "verb-master-pro-2026",
+  "version": "1.1.0",
+  "description": "AI Verb & Phrasal Verb Analyzer",
   "main": "api/generate.js",
   "dependencies": {
     "node-fetch": "^3.3.2"
   },
-  "devDependencies": {},
-  "scripts": {
-    "start": "echo 'Open public/index.html in your browser'"
-  },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
