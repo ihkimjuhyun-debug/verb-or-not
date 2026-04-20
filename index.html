@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Verb Context Master</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; padding: 20px; background: #f4f7f6; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        input { flex: 2; min-width: 200px; }
+        button { padding: 12px 25px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2980b9; }
+
+        .result-section { margin-top: 30px; border-top: 2px solid #eee; pt: 20px; }
+        .example-card { background: #f8f9fa; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 10px; border-radius: 4px; }
+        .eng { font-size: 18px; font-weight: 600; color: #2c3e50; }
+        .kor { color: #7f8c8d; margin-top: 5px; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-bottom: 5px; background: #e0e0e0; }
+
+        .history-section { margin-top: 40px; }
+        .history-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔍 Verb Context Master</h1>
+    
+    <div class="input-group">
+        <input type="text" id="wordInput" placeholder="단어나 숙어를 입력하세요 (예: add to)">
+        <select id="difficulty">
+            <option value="Easy">쉬움 (초급)</option>
+            <option value="Medium">중간 (중급)</option>
+            <option value="Hard">어려움 (고급)</option>
+        </select>
+        <select id="count">
+            <option value="3">3개</option>
+            <option value="5">5개</option>
+            <option value="7">7개</option>
+            <option value="10">10개</option>
+        </select>
+        <button onclick="generateExamples()">예문 보기 & 저장</button>
+    </div>
+
+    <div id="resultArea" class="result-section">
+        </div>
+
+    <div class="history-section">
+        <h3>📂 최근 검색 기록 (Local Storage)</h3>
+        <div id="historyList"></div>
+    </div>
+</div>
+
+<script>
+    // 로컬 스토리지에서 기록 불러오기
+    let searchHistory = JSON.parse(localStorage.getItem('verbHistory')) || [];
+
+    function generateExamples() {
+        const word = document.getElementById('wordInput').value;
+        const diff = document.getElementById('difficulty').value;
+        const count = document.getElementById('count').value;
+
+        if (!word) { alert('단어를 입력해주세요!'); return; }
+
+        // 1. 결과 화면 구성 (실제로는 API에서 데이터를 받아오는 부분)
+        // 여기서는 구조를 보여드리기 위해 Mock 데이터를 생성합니다.
+        const resultArea = document.getElementById('resultArea');
+        resultArea.innerHTML = `<h2>"${word}" 학습 결과 (${diff})</h2>`;
+
+        for (let i = 1; i <= count; i++) {
+            const card = document.createElement('div');
+            card.className = 'example-card';
+            card.innerHTML = `
+                <div class="badge">${diff} Level - Example ${i}</div>
+                <div class="eng">This is a sample sentence for <strong>${word}</strong> #${i}.</div>
+                <div class="kor">이것은 <strong>${word}</strong>를 위한 #${i}번째 샘플 예문입니다.</div>
+            `;
+            resultArea.appendChild(card);
+        }
+
+        // 2. 기록 저장 로직
+        const searchItem = {
+            word: word,
+            level: diff,
+            count: count,
+            date: new Date().toLocaleString()
+        };
+        
+        searchHistory.unshift(searchItem); // 최신순 정렬
+        if (searchHistory.length > 10) searchHistory.pop(); // 최대 10개 저장
+        
+        localStorage.setItem('verbHistory', JSON.stringify(searchHistory));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        searchHistory.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `
+                <span><strong>${item.word}</strong> (${item.level}) - ${item.count}개</span>
+                <span style="color: #999;">${item.date}</span>
+            `;
+            historyList.appendChild(div);
+        });
+    }
+
+    // 페이지 로드 시 기록 표시
+    renderHistory();
+</script>
+
+</body>
+</html>
