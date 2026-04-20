@@ -3,21 +3,29 @@ export default async function handler(req, res) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: "KEY_NOT_FOUND", message: "Vercel 설정에 API 키가 없습니다." });
+    return res.status(500).json({ error: "KEY_NOT_FOUND", message: "Vercel 설정에서 API 키를 확인하세요." });
   }
 
-  const prompt = `Analyze "${word}". 
-  1. Structure: Phrasal verb or standard verb?
-  2. Following Form: Noun, Gerund(-ing), or Base Verb?
+  const prompt = `Analyze the English phrase "${word}". 
+  Provide analysis in both English and Korean (e.g., "Phrasal Verb (구동사)").
+  1. Structure: Verb type?
+  2. Following Form: What follows (Noun, Gerund, or Base Verb)?
   3. "To" Analysis: If "to" exists, is it a Preposition or To-Infinitive?
-  4. Separability: If phrasal, can it be separated (e.g., "give it up")?
+  4. Separability: Can it be separated (e.g., "give it up")?
   5. Examples: Generate ${count} sentences for level ${difficulty}.
-  * IMPORTANT: Use 100% daily life scenarios. If separable, include one example like "${word.split(' ')[0]} you ${word.split(' ')[1] || ''}".
   
-  Return ONLY JSON format:
+  * CRITICAL: Use 100% daily-life conversation scenarios. No sports or technical jargon.
+  * If separable, include an example like "${word.split(' ')[0]} you ${word.split(' ')[1] || ''}".
+
+  Return ONLY JSON:
   {
-    "analysis": { "type": "", "next": "", "to_type": "", "separable": "" },
-    "examples": [ {"eng": "", "kor": "", "is_sep": true/false} ]
+    "analysis": { 
+      "type": "English (Korean)", 
+      "next": "English (Korean)", 
+      "to_type": "English (Korean)", 
+      "separable": "English (Korean)" 
+    },
+    "examples": [ {"eng": "...", "kor": "...", "is_sep": true/false} ]
   }`;
 
   try {
@@ -32,10 +40,7 @@ export default async function handler(req, res) {
     });
 
     const raw = await response.json();
-    if (raw.error) return res.status(500).json({ error: "AI_ERROR", message: raw.error.message });
-
     let content = raw.choices[0].message.content;
-    // JSON만 쏙 뽑아내는 정규식 (마크다운 무시)
     const match = content.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("JSON_NOT_FOUND");
     
