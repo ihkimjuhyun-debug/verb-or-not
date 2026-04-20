@@ -1,0 +1,16 @@
+# Dependency directories
+node_modules/
+
+# Environment variables (중요: 로컬 테스트용 키 파일)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# Vercel folder
+.vercel
