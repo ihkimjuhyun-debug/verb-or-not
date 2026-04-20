@@ -3,50 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verb Master Pro</title>
+    <title>Verb Master Pro + Grammar</title>
     <style>
-        :root { --primary: #4f46e5; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 2rem; border-radius: 1rem; shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .input-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; flex: 1; }
-        button { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        button:disabled { background: #9ca3af; }
-        .card { border-left: 4px solid var(--primary); padding: 15px; background: #fff; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 0 8px 8px 0; }
-        .eng { font-size: 1.1rem; font-weight: bold; color: #1e293b; }
-        .kor { color: #64748b; margin-top: 5px; }
-        .desc { font-size: 0.85rem; color: #94a3b8; margin-top: 8px; font-style: italic; }
-        .history-list { margin-top: 30px; font-size: 0.9rem; border-top: 1px solid #eee; pt: 20px; }
+        :root { --primary: #6366f1; --accent: #f43f5e; --bg: #f1f5f9; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        .header { text-align: center; margin-bottom: 2rem; }
+        .input-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        input { flex: 2; min-width: 200px; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        button { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
+
+        /* 문법 분석 박스 스타일 */
+        .analysis-box { background: #eef2ff; border: 1px solid #c7d2fe; padding: 20px; border-radius: 15px; margin-bottom: 25px; display: none; }
+        .analysis-box h3 { margin-top: 0; color: var(--primary); }
+        .tag { display: inline-block; padding: 4px 12px; background: white; border: 1px solid var(--primary); border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-right: 5px; }
+        .to-warning { color: var(--accent); font-weight: bold; }
+
+        .example-card { border-bottom: 1px solid #f1f5f9; padding: 15px 0; }
+        .eng { font-size: 1.15rem; font-weight: 700; color: #1e293b; }
+        .kor { color: #64748b; margin: 5px 0; }
+        .point { font-size: 0.9rem; color: #10b981; font-weight: 500; }
+
+        .loading { text-align: center; color: var(--primary); font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🚀 Verb Master Pro</h2>
-    <p>단어를 입력하면 동사 활용 예문을 생성합니다.</p>
+    <div class="header">
+        <h1>🔍 Verb & Phrase Analyzer</h1>
+        <p>구동사와 'to'의 성격까지 완벽하게 분석합니다.</p>
+    </div>
 
-    <div class="input-box">
-        <input type="text" id="word" placeholder="예: add to, take over...">
+    <div class="input-group">
+        <input type="text" id="word" placeholder="예: add to, look forward to, decide to">
         <select id="diff">
-            <option value="Easy">쉬움</option>
-            <option value="Medium">중간</option>
-            <option value="Hard">어려움</option>
+            <option value="Easy">초급</option>
+            <option value="Medium" selected>중급</option>
+            <option value="Hard">고급</option>
         </select>
         <select id="count">
             <option value="3">3개</option>
             <option value="5">5개</option>
-            <option value="10">10개</option>
         </select>
-        <button id="btn" onclick="fetchData()">생성</button>
+        <button id="btn" onclick="fetchData()">분석하기</button>
     </div>
 
-    <div id="loading" style="display:none;">AI가 예문을 생각 중입니다...</div>
+    <div id="loading" class="loading">AI 분석가가 문법을 해체하는 중...</div>
+
+    <div id="analysis" class="analysis-box">
+        <h3>💡 문법 포인트</h3>
+        <div id="tags"></div>
+        <p id="usage-tip" style="margin: 10px 0;"></p>
+        <p class="to-warning" id="to-type"></p>
+    </div>
+
     <div id="results"></div>
-
-    <div class="history-list">
-        <h3>📂 검색 기록</h3>
-        <div id="history"></div>
-    </div>
 </div>
 
 <script>
@@ -54,56 +68,49 @@
         const word = document.getElementById('word').value;
         const diff = document.getElementById('diff').value;
         const count = document.getElementById('count').value;
-        const btn = document.getElementById('btn');
-        
-        if(!word) return alert("단어를 입력하세요!");
+        if(!word) return;
 
-        btn.disabled = true;
         document.getElementById('loading').style.display = 'block';
+        document.getElementById('analysis').style.display = 'none';
         document.getElementById('results').innerHTML = '';
 
         try {
-            // 우리 서버리스 API 호출 (보안 유지)
-            const response = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=${count}`);
-            const data = await response.json();
-
-            renderResults(data);
-            saveToHistory(word, data);
+            const res = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=${count}`);
+            const data = await res.json();
+            
+            showAnalysis(data.grammar_analysis);
+            renderExamples(data.examples);
         } catch (e) {
-            alert("오류가 발생했습니다.");
+            alert("데이터를 가져오는데 실패했습니다.");
         } finally {
-            btn.disabled = false;
             document.getElementById('loading').style.display = 'none';
         }
     }
 
-    function renderResults(data) {
+    function showAnalysis(info) {
+        const box = document.getElementById('analysis');
+        box.style.display = 'block';
+        document.getElementById('tags').innerHTML = `
+            <span class="tag">${info.type}</span>
+            <span class="tag">뒤에 오는 형태: ${info.next_form}</span>
+        `;
+        document.getElementById('usage-tip').innerText = info.usage_tip;
+        document.getElementById('to-type').innerText = info.to_type !== "Not Applicable" 
+            ? `⚠️ "to"의 정체: 이 단어의 to는 [${info.to_type}]입니다!` 
+            : "";
+    }
+
+    function renderExamples(examples) {
         const container = document.getElementById('results');
-        data.forEach(item => {
-            container.innerHTML += `
-                <div class="card">
-                    <div class="eng">${item.eng}</div>
-                    <div class="kor">${item.kor}</div>
-                    <div class="desc">💡 ${item.desc}</div>
-                </div>
-            `;
-        });
+        container.innerHTML = '<h3>📝 맞춤형 예문</h3>' + examples.map(ex => `
+            <div class="example-card">
+                <div class="eng">${ex.eng}</div>
+                <div class="kor">${ex.kor}</div>
+                <div class="point">✔ 분석: ${ex.point}</div>
+            </div>
+        `).join('');
     }
-
-    function saveToHistory(word, results) {
-        let history = JSON.parse(localStorage.getItem('verbHistory') || '[]');
-        history.unshift({ word, date: new Date().toLocaleString(), results });
-        localStorage.setItem('verbHistory', JSON.stringify(history.slice(0, 20))); // 최근 20개 저장
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const histDiv = document.getElementById('history');
-        const history = JSON.parse(localStorage.getItem('verbHistory') || '[]');
-        histDiv.innerHTML = history.map(h => `<div><strong>${h.word}</strong> (${h.date})</div>`).join('');
-    }
-
-    renderHistory();
 </script>
+
 </body>
 </html>
