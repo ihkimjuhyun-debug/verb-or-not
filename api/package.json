@@ -1,7 +1,44 @@
-{
-  "name": "verb-master-final",
-  "version": "1.4.0",
-  "engines": {
-    "node": "24.x"
-  }
-}
+<script>
+    async function analyze() {
+        const word = document.getElementById('word').value.trim();
+        const diff = document.getElementById('diff').value;
+        if(!word) return;
+
+        const loader = document.getElementById('loader');
+        const exArea = document.getElementById('exArea');
+        const resGrid = document.getElementById('resGrid');
+
+        loader.style.display = 'block';
+        loader.style.color = '#6366f1';
+        loader.innerText = "문법 분석 중...";
+        resGrid.style.display = 'none';
+        exArea.innerHTML = '';
+
+        try {
+            const res = await fetch(`/api/generate?word=${word}&difficulty=${diff}&count=3`);
+            const data = await res.json();
+
+            // 에러가 발생했을 때 상세 내용 출력
+            if (data.error) {
+                loader.style.color = '#ef4444';
+                loader.innerHTML = `
+                    <div style="border:1px solid #fee2e2; background:#fef2f2; padding:15px; border-radius:12px;">
+                        <strong>⚠️ 에러 발생</strong><br>
+                        <small>${data.message}</small><br>
+                        <span style="font-size:10px;">코드: ${data.error}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // 정상 출력 로직
+            display(word, data);
+            save(word, data);
+            loader.style.display = 'none';
+        } catch (e) {
+            loader.style.color = '#ef4444';
+            loader.innerText = "네트워크 오류가 발생했습니다.";
+        }
+    }
+    // ... 나머지 display, save, speak 함수는 이전과 동일하게 유지 ...
+</script>
