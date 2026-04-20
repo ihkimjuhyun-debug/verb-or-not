@@ -1,0 +1,16 @@
+{
+  "name": "verb-master-pro",
+  "version": "1.0.0",
+  "description": "AI Verb Context Master",
+  "main": "api/generate.js",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "echo 'Open public/index.html in your browser'"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
